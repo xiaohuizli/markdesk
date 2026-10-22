@@ -1,0 +1,10 @@
+node_modules/
+.DS_Store
+coverage/
+dist/
+work/
+*.log
+.env
+.env.*
+*.pem
+*.key

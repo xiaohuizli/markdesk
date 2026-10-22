@@ -1,0 +1,12 @@
+import { execFileSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const image = path.join(root, 'dist', `Paper Search-mac-${process.arch === 'arm64' ? 'arm64' : 'x64'}.dmg`);
+if (!existsSync(image)) execFileSync(process.execPath, [path.join(root, 'scripts/build-macos.mjs')], { stdio: 'inherit' });
+const plist = execFileSync('/usr/bin/hdiutil', ['attach', '-readonly', '-nobrowse', '-plist', image], { encoding: 'utf8' });
+const mounted = JSON.parse(execFileSync('/usr/bin/plutil', ['-convert', 'json', '-o', '-', '-'], { input: plist, encoding: 'utf8' }));
+const volume = mounted['system-entities'].find((item) => item['mount-point'])?.['mount-point'];
+if (!volume) throw new Error('无法挂载桌面安装包');
+execFileSync('/usr/bin/open', [path.join(volume, 'Paper Search.app')]);

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="paper-token" content="__PAPER_TOKEN__">
+<title>Paper Search</title>
+<link rel="stylesheet" href="/assets/typora-icon/style.css"><link rel="stylesheet" href="/assets/font-awesome-4.1.0/css/font-awesome.min.css"><link rel="stylesheet" href="/assets/ionicons-2.0.1/css/ionicons.min.css"><link rel="stylesheet" href="/assets/github.css"><link rel="stylesheet" href="/style.css">
+<script src="/assets/markdown-it.min.js" defer></script><script type="module" src="/app.js"></script>
+</head><body>
+<aside id="typora-sidebar" aria-label="侧边栏">
+  <div class="sidebar-tabs">
+    <button id="switch-file-view" class="sidebar-tab-btn" aria-label="切换文件列表和文件树" title="切换文件列表和文件树"><i class="ty-icon ty-three-cells" aria-hidden="true"></i></button>
+    <button id="tab-files" class="sidebar-tab active" aria-selected="true">文件</button><button id="tab-outline" class="sidebar-tab" aria-selected="false">大纲</button>
+    <button id="show-search" class="sidebar-tab-btn" aria-label="搜索文件" title="搜索"><i class="ion-ios-search-strong" aria-hidden="true"></i></button>
+  </div>
+  <form id="search-form" class="sidebar-search" hidden>
+    <button id="search-back" type="button" class="sidebar-tab-btn" aria-label="关闭文件搜索"><i class="ty-icon ty-left-arrow" aria-hidden="true"></i></button>
+    <div class="query-wrap"><input id="query" type="search" aria-label="搜索文件内容" placeholder="搜索" autocomplete="off" spellcheck="false"><div class="search-options">
+      <label title="区分大小写"><input id="caseSensitive" type="checkbox" aria-label="区分大小写"><span class="option-icon case-icon"></span></label>
+      <label title="全词匹配"><input id="wholeWord" type="checkbox" aria-label="全词匹配"><span class="option-icon word-icon"></span></label>
+      <label title="正则表达式"><input id="regexp" type="checkbox" aria-label="正则表达式"><span class="option-icon regexp-icon"></span></label>
+    </div></div><button id="search-button" type="submit" hidden>搜索文件夹</button>
+  </form>
+  <div class="sidebar-content">
+    <section id="files-panel"><nav id="file-list" aria-label="工作区文件列表"></nav></section>
+    <nav id="outline-panel" aria-label="文档大纲" hidden></nav>
+    <section id="search-panel" hidden><div class="search-message"><span id="search-status" role="status" aria-live="polite"></span><button id="cancel" hidden aria-label="停止搜索"><i class="ty-icon ty-delete-button" aria-hidden="true"></i></button></div><div id="search-error" role="alert" hidden></div><div id="results"></div></section>
+  </div>
+  <footer class="sidebar-footer"><button id="quick-open" aria-label="快速打开" title="快速打开 ⇧⌘O"><i class="ty-icon ty-add" aria-hidden="true"></i></button><button id="folder-menu-toggle" class="folder-menu-toggle" aria-label="文件夹操作"><span id="workspace-name">打开文件夹…</span><i class="ty-icon ty-dots-v" aria-hidden="true"></i></button><button id="switch-file-view-footer" aria-label="切换文件视图"><i class="ty-icon ty-file-tree" aria-hidden="true"></i></button></footer>
+  <div id="folder-menu" class="popup-menu" hidden><div id="workspace-path" class="menu-path"></div><button id="open-file" hidden>打开文件…</button><button id="change-workspace">打开文件夹…</button><button id="refresh-files">刷新</button><button id="menu-search">搜索</button><button id="export-trace" disabled>导出搜索记录…</button><hr><label><input id="hidden" type="checkbox">显示隐藏文件</label><label><input id="ignore" type="checkbox">显示被忽略的文件</label><span id="file-count" hidden></span></div>
+</aside>
+<div id="sidebar-resizer" role="separator" tabindex="0" aria-label="侧栏宽度" aria-orientation="vertical" aria-valuemin="180" aria-valuemax="600" aria-valuenow="270"></div>
+<main id="writing-area" aria-label="文档阅读区">
+  <div class="window-controls"><span id="document-meta"></span><button id="toggle-source" aria-label="切换源代码模式" title="源代码模式"><i class="ty-icon ty-code" aria-hidden="true"></i></button><button id="toggle-sidebar" aria-label="显示或隐藏侧栏" title="侧边栏"><i class="ty-icon ty-sidebar" aria-hidden="true"></i></button></div>
+  <div id="document-search" class="find-toolbar" hidden><label for="document-find">搜索</label><div class="find-input-wrap"><input id="document-find" placeholder="查找" aria-label="文内查找" autocomplete="off"><button id="find-case" aria-label="文内查找区分大小写" aria-pressed="false" class="option-icon case-icon"></button><button id="find-whole" aria-label="文内查找全词匹配" aria-pressed="false" class="option-icon word-icon"></button><button id="find-regexp" aria-label="文内查找正则表达式" aria-pressed="false" class="option-icon regexp-icon"></button></div><button id="find-prev" aria-label="上一个文内匹配"><i class="ion-chevron-up" aria-hidden="true"></i></button><button id="find-next" aria-label="下一个文内匹配"><i class="ion-chevron-down" aria-hidden="true"></i></button><span id="find-count"></span><button id="find-close" aria-label="关闭文内查找"><i class="ion-close-round" aria-hidden="true"></i></button></div>
+  <div id="document-error" role="alert" hidden></div><div id="reader" class="reader"><article id="write"></article></div>
+  <div id="document-position" class="document-position" aria-live="polite" hidden></div><span id="document-title" hidden>未命名</span><span id="document-folder" hidden></span>
+</main>
+<dialog id="workspace-dialog"><form id="workspace-form"><h2>打开文件夹</h2><label for="folder-path">文件夹路径</label><input id="folder-path" required><p id="workspace-error" role="alert"></p><div class="dialog-actions"><button type="button" id="workspace-dismiss">取消</button><button type="submit">打开</button></div></form></dialog>
+<dialog id="quick-dialog"><input id="quick-query" aria-label="快速打开" placeholder="搜索文件名" autocomplete="off"><div id="quick-results"></div><button id="quick-dismiss" hidden>关闭</button></dialog>
+</body></html>
