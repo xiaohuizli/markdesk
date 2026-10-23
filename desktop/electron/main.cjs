@@ -2,6 +2,7 @@ const { app, BrowserWindow, Menu, dialog, ipcMain } = require('electron');
 const path = require('node:path');
 const fs = require('node:fs/promises');
 const { pathToFileURL } = require('node:url');
+app.setName('MarkDesk');
 const root = path.resolve(__dirname, '../..');
 const extensions = ['md', 'markdown', 'mdx', 'mdown', 'mkd', 'txt', 'text', 'rmd', 'qmd'];
 const filters = [{ name: 'Markdown / 文本', extensions }];
@@ -35,7 +36,7 @@ function menus() {
       { label: '打开文件夹…', accelerator: 'CmdOrCtrl+Alt+O', click: async () => { const value = await chooseFolder(); if (value) send('paper-open-workspace', value); } },
       { label: '快速打开…', accelerator: 'CmdOrCtrl+Shift+O', click: () => command('quick') },
       { label: '导出搜索记录…', accelerator: 'CmdOrCtrl+Shift+E', click: () => window.webContents.executeJavaScript("document.querySelector('#export-trace').click()") },
-      { type: 'separator' }, { role: 'quit', label: '退出 Paper Search' },
+      { type: 'separator' }, { role: 'quit', label: '退出 MarkDesk' },
     ] },
     { label: '编辑', submenu: [{ role: 'undo', label: '撤销' }, { role: 'redo', label: '重做' }, { type: 'separator' }, { role: 'cut', label: '剪切' }, { role: 'copy', label: '复制' }, { role: 'paste', label: '粘贴' }, { role: 'selectAll', label: '全选' }] },
     { label: '显示', submenu: [
@@ -65,9 +66,9 @@ ipcMain.handle('paper-native', async (event, method, data = {}) => {
       return { ok: true };
     case 'documentDidChange':
       if (typeof data.name !== 'string') throw new Error('文档名称无效');
-      window.setTitle(data.name + ' — Paper Search'); return { ok: true };
+      window.setTitle(data.name + ' — MarkDesk'); return { ok: true };
     case 'saveTrace': {
-      const result = await dialog.showSaveDialog(window, { title: '导出搜索记录', defaultPath: 'Paper Search 记录.json', filters: [{ name: 'JSON', extensions: ['json'] }] });
+      const result = await dialog.showSaveDialog(window, { title: '导出搜索记录', defaultPath: 'MarkDesk 记录.json', filters: [{ name: 'JSON', extensions: ['json'] }] });
       if (result.canceled || !result.filePath) return { saved: false };
       await fs.writeFile(result.filePath, JSON.stringify(data.data, null, 2)); return { saved: true };
     }
@@ -78,7 +79,7 @@ ipcMain.handle('paper-open-dropped-file', (event, value) => { trusted(event); if
 function fail(error) {
   console.error(error);
   if (smoke) app.exit(1);
-  else { dialog.showErrorBox('Paper Search 无法启动', error.message); app.quit(); }
+  else { dialog.showErrorBox('MarkDesk 无法启动', error.message); app.quit(); }
 }
 async function verifySmoke() {
   let ui;
@@ -91,7 +92,7 @@ async function verifySmoke() {
   const response = await fetch(origin + '/api/search', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-paper-token': backend.token }, body: JSON.stringify({ query: '搜索', clientId: 'desktop-smoke', requestId: 'smoke-1', revision: 0, options: {} }), signal: AbortSignal.timeout(10000) });
   const stream = await response.text();
   if (!response.ok || !stream.includes('"type":"file"') || !stream.includes('"type":"done"') || stream.includes('"type":"error"')) throw new Error('真实搜索验证失败: ' + stream.slice(-1000));
-  const result = { event: 'smoke.passed', platform: process.platform, arch: process.arch, ui, packaged: app.isPackaged };
+  const result = { event: 'smoke.passed', product: app.getName(), platform: process.platform, arch: process.arch, ui, packaged: app.isPackaged };
   if (process.env.PAPER_SMOKE_RESULT) await fs.writeFile(process.env.PAPER_SMOKE_RESULT, JSON.stringify(result));
   console.log(JSON.stringify(result));
   app.quit();
@@ -103,15 +104,19 @@ else {
   app.whenReady().then(async () => {
     workspaceFile = path.join(app.getPath('userData'), 'workspace.json');
     let workspace = path.join(root, 'demo');
-    if (!smoke) try {
-      const saved = JSON.parse(await fs.readFile(workspaceFile, 'utf8')).workspace;
-      if (typeof saved === 'string' && path.isAbsolute(saved) && (await fs.stat(saved)).isDirectory()) workspace = saved;
-    } catch {}
+    if (!smoke) {
+      // Import the previous product's workspace without changing or deleting its settings.
+      const settings = [workspaceFile, ...['paper-search', 'Paper Search'].map(name => path.join(app.getPath('appData'), name, 'workspace.json'))];
+      for (const file of settings) try {
+        const saved = JSON.parse(await fs.readFile(file, 'utf8')).workspace;
+        if (typeof saved === 'string' && path.isAbsolute(saved) && (await fs.stat(saved)).isDirectory()) { workspace = saved; break; }
+      } catch {}
+    }
     const { createApp } = await import(pathToFileURL(path.join(root, 'src/server.js')).href);
     backend = await createApp({ workspace });
     await new Promise((resolve, reject) => { backend.server.once('error', reject); backend.server.listen(0, '127.0.0.1', resolve); });
     origin = 'http://127.0.0.1:' + backend.server.address().port;
-    window = new BrowserWindow({ width: 1280, height: 840, minWidth: 700, minHeight: 450, title: 'Paper Search', icon: path.join(root, 'desktop/assets/icon.png'), backgroundColor: '#ffffff', webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true, webSecurity: true } });
+    window = new BrowserWindow({ width: 1280, height: 840, minWidth: 700, minHeight: 450, title: 'MarkDesk', icon: path.join(root, 'desktop/assets/icon.png'), backgroundColor: '#ffffff', webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true, webSecurity: true } });
     window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
     window.webContents.on('will-navigate', (event, url) => { if (url !== origin + '/') event.preventDefault(); });
     window.webContents.session.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));

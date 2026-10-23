@@ -326,7 +326,7 @@ $('#export-trace').addEventListener('click', async () => {
     const data = await get('/api/trace?requestId=' + state.requestId);
     if (window.paperDesktop) { await window.paperDesktop.request('saveTrace', { data }); return; }
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob), a = node('a'); a.href = url; a.download = 'paper-search-trace-' + state.requestId + '.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    const url = URL.createObjectURL(blob), a = node('a'); a.href = url; a.download = 'markdesk-trace-' + state.requestId + '.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   } catch (e) { error('#search-error', e.message); }
 });
 document.body.classList.toggle('desktop',Boolean(window.paperDesktop));

@@ -145,7 +145,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const app = await createApp({ workspace: process.env.PAPER_WORKSPACE || path.join(project, 'demo') });
   app.server.listen(Number(process.env.PORT || 4318), '127.0.0.1', () => {
     const url = 'http://127.0.0.1:' + app.server.address().port;
-    console.log(process.env.PAPER_DESKTOP === '1' ? JSON.stringify({ event: 'ready', url }) : 'Paper Search ' + url);
+    console.log(process.env.PAPER_DESKTOP === '1' ? JSON.stringify({ event: 'ready', url }) : 'MarkDesk ' + url);
   });
   const parent = Number(process.env.PAPER_PARENT_PID);
   if (Number.isInteger(parent) && parent > 1) {

@@ -84,6 +84,7 @@ final class PaperApplication: NSObject, NSApplicationDelegate, NSWindowDelegate,
         window.delegate = self
         window.minSize = NSSize(width: 700, height: 450)
         window.contentView = webView
+        // Preserve the original key so existing window preferences survive the rename.
         window.setFrameAutosaveName("PaperSearchMainWindow")
         window.center(); window.makeKeyAndOrderFront(nil)
         buildMenus(); NSApp.activate(ignoringOtherApps: true)
@@ -237,7 +238,7 @@ final class PaperApplication: NSObject, NSApplicationDelegate, NSWindowDelegate,
     @objc func openFile() { chooseFile { url in if let url { self.acceptFile(url, source: "menu") } } }
     func saveTrace(_ id: String, _ value: Any?) {
         guard let value, let data = try? JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted, .sortedKeys]) else { return reply(id, [:], error: "记录格式无效") }
-        let panel = NSSavePanel(); panel.title = "导出搜索记录"; panel.allowedContentTypes = [.json]; panel.nameFieldStringValue = "Paper Search 记录.json"
+        let panel = NSSavePanel(); panel.title = "导出搜索记录"; panel.allowedContentTypes = [.json]; panel.nameFieldStringValue = "MarkDesk 记录.json"
         panel.beginSheetModal(for: window) { response in
             guard response == .OK, let url = panel.url else { return self.reply(id, ["saved": false]) }
             do { try data.write(to: url, options: .atomic); self.log("trace.saved", ["path": url.path]); self.reply(id, ["saved": true]) }
@@ -264,10 +265,10 @@ final class PaperApplication: NSObject, NSApplicationDelegate, NSWindowDelegate,
         func item(_ menu: NSMenu, _ title: String, _ action: Selector, _ key: String = "", _ modifiers: NSEvent.ModifierFlags = [.command], target: AnyObject? = nil) {
             let entry = NSMenuItem(title: title, action: action, keyEquivalent: key); entry.keyEquivalentModifierMask = modifiers; entry.target = target; menu.addItem(entry)
         }
-        let app = menu("Paper Search")
-        item(app, "关于 Paper Search", #selector(NSApplication.orderFrontStandardAboutPanel(_:)), target: NSApp)
-        app.addItem(.separator()); item(app, "隐藏 Paper Search", #selector(NSApplication.hide(_:)), "h", target: NSApp)
-        app.addItem(.separator()); item(app, "退出 Paper Search", #selector(NSApplication.terminate(_:)), "q", target: NSApp)
+        let app = menu("MarkDesk")
+        item(app, "关于 MarkDesk", #selector(NSApplication.orderFrontStandardAboutPanel(_:)), target: NSApp)
+        app.addItem(.separator()); item(app, "隐藏 MarkDesk", #selector(NSApplication.hide(_:)), "h", target: NSApp)
+        app.addItem(.separator()); item(app, "退出 MarkDesk", #selector(NSApplication.terminate(_:)), "q", target: NSApp)
         let file = menu("文件")
         item(file, "打开文件…", #selector(openFile), "o", target: self)
         item(file, "打开文件夹…", #selector(openFolder), "o", [.command, .option], target: self)
@@ -293,7 +294,7 @@ final class PaperApplication: NSObject, NSApplicationDelegate, NSWindowDelegate,
     func showError(_ message: String) {
         guard !stopping else { return }
         launchTimer?.invalidate(); log("app.error", ["message": message])
-        let alert = NSAlert(); alert.messageText = "Paper Search 无法启动"; alert.informativeText = message; alert.addButton(withTitle: "退出")
+        let alert = NSAlert(); alert.messageText = "MarkDesk 无法启动"; alert.informativeText = message; alert.addButton(withTitle: "退出")
         alert.beginSheetModal(for: window) { _ in NSApp.terminate(nil) }
     }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
