@@ -1,26 +1,26 @@
 <p align="center">
-  <img src="desktop/assets/icon.png" width="96" height="96" alt="Paper Search 图标">
+  <img src="desktop/assets/icon.png" width="96" height="96" alt="MarkDesk 图标">
 </p>
 
-# Paper Search
+# MarkDesk
 
-一款在本机搜索、阅读 Markdown 和文本文件的桌面工具，支持 macOS 与 Windows 64 位。
+面向 Markdown 文档的桌面工作台，提供本地阅读、文件导航与全文搜索，支持 macOS 与 Windows 64 位。
 
 打开一个文件夹，即可同时搜索文件内容和文件名。点击匹配结果，直接跳转到文档对应行。安装包内置运行时和 ripgrep，无需额外安装 Node.js。
 
-[下载安装包](https://github.com/xiaohuizli/paper-search/releases/latest) · [构建与验证](https://github.com/xiaohuizli/paper-search/actions/workflows/build-installers.yml) · [发布流程说明](https://github.com/xiaohuizli/paper-search/blob/docs/docs/github-releases.md)
+[下载安装包](https://github.com/xiaohuizli/markdesk/releases/latest) · [构建与验证](https://github.com/xiaohuizli/markdesk/actions/workflows/build-installers.yml) · [发布流程说明](https://github.com/xiaohuizli/markdesk/blob/docs/docs/github-releases.md)
 
 ## 下载与安装
 
-当前版本：**v1.4.1**。
+当前版本：**v1.5.0**。
 
-此版本修复 macOS 窗口拖动问题：顶部保留独立的原生标题栏，可直接拖动标题栏移动窗口。
+此版本将 Paper Search 统一更名为 **MarkDesk**，同步更新软件名称、仓库、菜单和安装包；保留原有工作区设置与 macOS 窗口拖动修复。
 
 | 系统 | 安装包 | 安装方式 |
 | --- | --- | --- |
-| macOS · Apple Silicon（M 系列） | [下载 ARM64 DMG](https://github.com/xiaohuizli/paper-search/releases/download/v1.4.1/Paper.Search-mac-arm64.dmg) | 打开 DMG，将 Paper Search 拖入 Applications |
-| macOS · Intel | [下载 x64 DMG](https://github.com/xiaohuizli/paper-search/releases/download/v1.4.1/Paper.Search-mac-x64.dmg) | 打开 DMG，将 Paper Search 拖入 Applications |
-| Windows · 64 位 | [下载 x64 安装程序](https://github.com/xiaohuizli/paper-search/releases/download/v1.4.1/Paper-Search-1.4.1-win-x64-setup.exe) | 运行安装向导，选择安装位置和快捷方式 |
+| macOS · Apple Silicon（M 系列） | [下载 ARM64 DMG](https://github.com/xiaohuizli/markdesk/releases/download/v1.5.0/MarkDesk-mac-arm64.dmg) | 打开 DMG，将 MarkDesk 拖入 Applications |
+| macOS · Intel | [下载 x64 DMG](https://github.com/xiaohuizli/markdesk/releases/download/v1.5.0/MarkDesk-mac-x64.dmg) | 打开 DMG，将 MarkDesk 拖入 Applications |
+| Windows · 64 位 | [下载 x64 安装程序](https://github.com/xiaohuizli/markdesk/releases/download/v1.5.0/MarkDesk-1.5.0-win-x64-setup.exe) | 运行安装向导，选择安装位置和快捷方式 |
 
 macOS 最低版本为 13。Windows 安装程序支持按用户安装，并提供卸载入口。
 
@@ -39,7 +39,7 @@ macOS 安装包采用 ad-hoc 签名，尚未完成 Apple 公证；Windows 安装
 
 ## 快速上手
 
-1. 启动 Paper Search，默认可阅读内置示例文档。
+1. 启动 MarkDesk，默认可阅读内置示例文档。
 2. 从“文件 → 打开文件夹…”选择要搜索的目录；也可以打开单个 Markdown 或文本文件。
 3. 打开“文件夹搜索”，输入关键词，按需切换大小写、整词或正则选项。
 4. 点击结果中的匹配行，查看文档并定位原文。
@@ -65,8 +65,8 @@ macOS 安装包采用 ad-hoc 签名，尚未完成 Apple 公证；Windows 安装
 需要 **Node.js 22.12 或更高版本**，建议使用 CI 同系列的 Node.js 24。macOS 原生应用构建还需要 Xcode Command Line Tools。
 
 ```sh
-git clone https://github.com/xiaohuizli/paper-search.git
-cd paper-search
+git clone https://github.com/xiaohuizli/markdesk.git
+cd markdesk
 npm ci
 ```
 
@@ -134,7 +134,7 @@ macOS 与 Windows 复用相同的前端和搜索服务。服务仅监听 `127.0.
 
 CI 执行代码检查与自动化测试，并在三个目标平台启动打包后的应用，验证界面、原生桥接和真实搜索。Windows 验证对象是打包目录内的应用，不等同于人工交互式安装向导验收。
 
-首页 README 与源码在 `main` 分支，补充文档在 [`docs` 分支](https://github.com/xiaohuizli/paper-search/tree/docs)。
+首页 README 与源码在 `main` 分支，补充文档在 [`docs` 分支](https://github.com/xiaohuizli/markdesk/tree/docs)。
 
 ## 支持范围与限制
 
