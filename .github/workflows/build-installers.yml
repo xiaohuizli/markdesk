@@ -104,5 +104,5 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
-          gh release view "$RELEASE_TAG" >/dev/null 2>&1 || gh release create "$RELEASE_TAG" --verify-tag --title "Paper Search $RELEASE_TAG" --notes-file .github/release-notes.md
+          gh release view "$RELEASE_TAG" >/dev/null 2>&1 || gh release create "$RELEASE_TAG" --verify-tag --title "MarkDesk $RELEASE_TAG" --notes-file .github/release-notes.md
           find release-assets -type f \( -name '*.dmg' -o -name '*.app.zip' -o -name '*-setup.exe' \) -exec gh release upload "$RELEASE_TAG" --clobber '{}' +

@@ -6,10 +6,13 @@ import { setTimeout as delay } from 'node:timers/promises';
 const root = process.cwd(), arch = process.arch === 'arm64' ? 'arm64' : 'x64';
 const scratch = mkdtempSync(path.join(tmpdir(), 'paper-macos-smoke-'));
 const diagnostics = path.join(root, 'work', 'macos-smoke'); mkdirSync(diagnostics, { recursive: true });
-const application = path.join(scratch, 'Paper Search.app');
+const application = path.join(scratch, 'MarkDesk.app');
 const logFile = path.join(diagnostics, 'launch.jsonl'); rmSync(logFile, { force: true });
-execFileSync('/usr/bin/ditto', ['-x', '-k', path.join(root, 'dist', `Paper Search-mac-${arch}.app.zip`), scratch]);
+execFileSync('/usr/bin/ditto', ['-x', '-k', path.join(root, 'dist', `MarkDesk-mac-${arch}.app.zip`), scratch]);
 execFileSync('/usr/bin/codesign', ['--verify', '--deep', '--strict', application], { stdio: 'inherit' });
+for (const key of ['CFBundleName', 'CFBundleDisplayName', 'CFBundleExecutable']) {
+  if (execFileSync('/usr/bin/plutil', ['-extract', key, 'raw', path.join(application, 'Contents/Info.plist')], { encoding: 'utf8' }).trim() !== 'MarkDesk') throw new Error('macOS 应用名称未统一: ' + key);
+}
 execFileSync('/usr/bin/open', ['-n', application, '--env', 'PAPER_DESKTOP_LOG=' + logFile, '--env', 'PAPER_WORKSPACE=' + path.join(application, 'Contents/Resources/app/demo')]);
 let records = [];
 try {

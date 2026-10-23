@@ -40,7 +40,7 @@ const wanted = arch === 'arm64' ? 'arm64' : 'x86_64';
 if (!run('/usr/bin/lipo', ['-archs', node]).split(/\s+/).includes(wanted)) throw new Error('Node.js 运行时架构不匹配');
 // Sign outside file-provider managed folders, which can add Finder metadata mid-build.
 const scratch = mkdtempSync(path.join(tmpdir(), 'paper-macos-build-'));
-const app = path.join(scratch, 'Paper Search.app');
+const app = path.join(scratch, 'MarkDesk.app');
 const contents = path.join(app, 'Contents'), resources = path.join(contents, 'Resources'), payload = path.join(resources, 'app');
 mkdirSync(path.join(contents, 'MacOS'), { recursive: true }); mkdirSync(path.join(resources, 'runtime'), { recursive: true }); mkdirSync(payload, { recursive: true });
 for (const folder of ['src', 'public', 'demo']) cpSync(path.join(root, folder), path.join(payload, folder), { recursive: true });
@@ -51,11 +51,11 @@ for (const name of ['ripgrep', `ripgrep-darwin-${arch === 'arm64' ? 'arm64' : 'x
 const bundledNode = path.join(resources, 'runtime/node'); cpSync(node, bundledNode); chmodSync(bundledNode, 0o755);
 cpSync(path.join(root, 'vendor/licenses'), path.join(resources, 'Licenses'), { recursive: true });
 console.log('编译原生 macOS 宿主…');
-run('/usr/bin/xcrun', ['swiftc', '-O', '-swift-version', '5', '-target', `${wanted}-apple-macosx13.0`, '-framework', 'AppKit', '-framework', 'WebKit', path.join(root, 'desktop/Main.swift'), '-o', path.join(contents, 'MacOS/PaperSearch')]);
+run('/usr/bin/xcrun', ['swiftc', '-O', '-swift-version', '5', '-target', `${wanted}-apple-macosx13.0`, '-framework', 'AppKit', '-framework', 'WebKit', path.join(root, 'desktop/Main.swift'), '-o', path.join(contents, 'MacOS/MarkDesk')]);
 const icon = path.join(root, 'desktop/assets/icon.png'), iconset = path.join(work, 'AppIcon.iconset'); mkdirSync(iconset, { recursive: true });
 for (const size of [16, 32, 128, 256, 512]) for (const scale of [1, 2]) run('/usr/bin/sips', ['-z', String(size * scale), String(size * scale), icon, '--out', path.join(iconset, `icon_${size}x${size}${scale === 2 ? '@2x' : ''}.png`)]);
 run('/usr/bin/iconutil', ['-c', 'icns', iconset, '-o', path.join(resources, 'AppIcon.icns')]);
-const plist = { CFBundleExecutable: 'PaperSearch', CFBundleIdentifier: 'io.papersearch.desktop', CFBundleName: 'Paper Search', CFBundleDisplayName: 'Paper Search', CFBundlePackageType: 'APPL', CFBundleShortVersionString: appVersion, CFBundleVersion: '6', CFBundleIconFile: 'AppIcon', NSPrincipalClass: 'NSApplication', LSMinimumSystemVersion: '13.0', NSHighResolutionCapable: true, NSRequiresAquaSystemAppearance: true, NSAppTransportSecurity: { NSAllowsLocalNetworking: true }, CFBundleDevelopmentRegion: 'zh-Hans', CFBundleLocalizations: ['zh-Hans', 'en'] };
+const plist = { CFBundleExecutable: 'MarkDesk', CFBundleIdentifier: 'io.papersearch.desktop', CFBundleName: 'MarkDesk', CFBundleDisplayName: 'MarkDesk', CFBundlePackageType: 'APPL', CFBundleShortVersionString: appVersion, CFBundleVersion: '7', CFBundleIconFile: 'AppIcon', NSPrincipalClass: 'NSApplication', LSMinimumSystemVersion: '13.0', NSHighResolutionCapable: true, NSRequiresAquaSystemAppearance: true, NSAppTransportSecurity: { NSAllowsLocalNetworking: true }, CFBundleDevelopmentRegion: 'zh-Hans', CFBundleLocalizations: ['zh-Hans', 'en'] };
 plist.CFBundleDocumentTypes = [{ CFBundleTypeName: 'Markdown / Text', CFBundleTypeRole: 'Viewer', LSHandlerRank: 'Alternate', LSItemContentTypes: ['net.daringfireball.markdown', 'public.plain-text'], CFBundleTypeExtensions: ['md','markdown','mdx','mdown','mkd','txt','text','rmd','qmd'] }];
 plist.UTImportedTypeDeclarations = [{ UTTypeIdentifier: 'net.daringfireball.markdown', UTTypeDescription: 'Markdown document', UTTypeConformsTo: ['public.plain-text'], UTTypeTagSpecification: { 'public.filename-extension': ['md','markdown','mdx','mdown','mkd','rmd','qmd'], 'public.mime-type': 'text/markdown' } }];
 const plistJSON = path.join(work, 'Info.json'); writeFileSync(plistJSON, JSON.stringify(plist)); run('/usr/bin/plutil', ['-convert', 'xml1', '-o', path.join(contents, 'Info.plist'), plistJSON]);
@@ -68,16 +68,16 @@ for (const binary of [bundledNode, path.join(payload, 'node_modules', '@vscode',
 run('/usr/bin/codesign', ['--force', '--sign', '-', app]); run('/usr/bin/codesign', ['--verify', '--deep', '--strict', app]);
 const hash = (file) => createHash('sha256').update(readFileSync(file)).digest('hex');
 const bundledRg = path.join(payload, 'node_modules', '@vscode', `ripgrep-darwin-${arch}`, 'bin/rg');
-const manifest = { product: 'Paper Search', version: appVersion, arch, minimumMacOS: '13.0', host: 'AppKit + WKWebView', bundledNode: { version, sha256: hash(bundledNode), dependencies }, bundledRg: { version: run(bundledRg, ['--version']).split('\n')[0], sha256: hash(bundledRg) }, hostSha256: hash(path.join(contents, 'MacOS/PaperSearch')), signing: 'local ad-hoc; not Developer ID notarized' };
+const manifest = { product: 'MarkDesk', version: appVersion, arch, minimumMacOS: '13.0', host: 'AppKit + WKWebView', bundledNode: { version, sha256: hash(bundledNode), dependencies }, bundledRg: { version: run(bundledRg, ['--version']).split('\n')[0], sha256: hash(bundledRg) }, hostSha256: hash(path.join(contents, 'MacOS/MarkDesk')), signing: 'local ad-hoc; not Developer ID notarized' };
 mkdirSync(path.join(root, 'dist'), { recursive: true });
 // Distribute immutable archives so sync-provider metadata cannot alter the app bundle.
-rmSync(path.join(root, 'dist', 'Paper Search.app'), { recursive: true, force: true });
-const destination = path.join(root, 'dist', `Paper Search-mac-${arch}.dmg`);
-const applicationZIP = path.join(root, 'dist', `Paper Search-mac-${arch}.app.zip`);
+rmSync(path.join(root, 'dist', 'MarkDesk.app'), { recursive: true, force: true });
+const destination = path.join(root, 'dist', `MarkDesk-mac-${arch}.dmg`);
+const applicationZIP = path.join(root, 'dist', `MarkDesk-mac-${arch}.app.zip`);
 symlinkSync('/Applications', path.join(scratch, 'Applications'));
 run('/usr/bin/ditto', ['-c', '-k', '--keepParent', '--norsrc', '--noextattr', app, applicationZIP]);
 console.log('生成 DMG 安装包…');
-run('/usr/bin/hdiutil', ['create', '-ov', '-format', 'UDZO', '-volname', 'Paper Search', '-srcfolder', scratch, destination]);
+run('/usr/bin/hdiutil', ['create', '-ov', '-format', 'UDZO', '-volname', 'MarkDesk', '-srcfolder', scratch, destination]);
 manifest.artifacts = { dmg: path.basename(destination), appZIP: path.basename(applicationZIP), dmgSha256: hash(destination), appZIPsha256: hash(applicationZIP) };
 writeFileSync(path.join(root, 'dist/build-manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
 rmSync(scratch, { recursive: true, force: true });

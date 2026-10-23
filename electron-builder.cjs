@@ -1,7 +1,7 @@
 module.exports = {
   appId: 'io.papersearch.desktop',
-  productName: 'Paper Search',
-  executableName: 'PaperSearch',
+  productName: 'MarkDesk',
+  executableName: 'MarkDesk',
   directories: { output: 'dist/windows', buildResources: 'desktop/assets' },
   asar: false,
   npmRebuild: false,
@@ -9,7 +9,7 @@ module.exports = {
   win: {
     target: [{ target: 'nsis', arch: ['x64'] }],
     icon: 'desktop/assets/icon.png',
-    artifactName: 'Paper-Search-${version}-win-${arch}-setup.${ext}',
+    artifactName: 'MarkDesk-${version}-win-${arch}-setup.${ext}',
   },
   nsis: {
     oneClick: false,
@@ -17,7 +17,7 @@ module.exports = {
     allowToChangeInstallationDirectory: true,
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
-    shortcutName: 'Paper Search',
-    uninstallDisplayName: 'Paper Search',
+    shortcutName: 'MarkDesk',
+    uninstallDisplayName: 'MarkDesk',
   },
 };
