@@ -12,13 +12,15 @@
 
 ## 下载与安装
 
-当前版本：**v1.4.0**。
+当前版本：**v1.4.1**。
+
+此版本修复 macOS 窗口拖动问题：顶部保留独立的原生标题栏，可直接拖动标题栏移动窗口。
 
 | 系统 | 安装包 | 安装方式 |
 | --- | --- | --- |
-| macOS · Apple Silicon（M 系列） | [下载 ARM64 DMG](https://github.com/xiaohuizli/paper-search/releases/download/v1.4.0/Paper.Search-mac-arm64.dmg) | 打开 DMG，将 Paper Search 拖入 Applications |
-| macOS · Intel | [下载 x64 DMG](https://github.com/xiaohuizli/paper-search/releases/download/v1.4.0/Paper.Search-mac-x64.dmg) | 打开 DMG，将 Paper Search 拖入 Applications |
-| Windows · 64 位 | [下载 x64 安装程序](https://github.com/xiaohuizli/paper-search/releases/download/v1.4.0/Paper-Search-1.4.0-win-x64-setup.exe) | 运行安装向导，选择安装位置和快捷方式 |
+| macOS · Apple Silicon（M 系列） | [下载 ARM64 DMG](https://github.com/xiaohuizli/paper-search/releases/download/v1.4.1/Paper.Search-mac-arm64.dmg) | 打开 DMG，将 Paper Search 拖入 Applications |
+| macOS · Intel | [下载 x64 DMG](https://github.com/xiaohuizli/paper-search/releases/download/v1.4.1/Paper.Search-mac-x64.dmg) | 打开 DMG，将 Paper Search 拖入 Applications |
+| Windows · 64 位 | [下载 x64 安装程序](https://github.com/xiaohuizli/paper-search/releases/download/v1.4.1/Paper-Search-1.4.1-win-x64-setup.exe) | 运行安装向导，选择安装位置和快捷方式 |
 
 macOS 最低版本为 13。Windows 安装程序支持按用户安装，并提供卸载入口。
 
