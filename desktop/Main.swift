@@ -19,7 +19,7 @@ final class DocumentWebView: WKWebView {
     }
 }
 
-final class PaperApplication: NSObject, NSApplicationDelegate, WKScriptMessageHandler, WKNavigationDelegate {
+final class PaperApplication: NSObject, NSApplicationDelegate, NSWindowDelegate, WKScriptMessageHandler, WKNavigationDelegate {
     var window: NSWindow!
     var webView: WKWebView!
     var backend: Process?
@@ -75,16 +75,24 @@ final class PaperApplication: NSObject, NSApplicationDelegate, WKScriptMessageHa
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = false
         webView.setValue(false, forKey: "drawsBackground")
-        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1280, height: 840), styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView], backing: .buffered, defer: false)
+        // Keep the web view below AppKit's native title bar so dragging moves the window.
+        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1280, height: 840), styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
         window.title = "未命名"
-        window.titlebarAppearsTransparent = true
+        window.titlebarAppearsTransparent = false
+        window.isMovable = true
+        window.isMovableByWindowBackground = false
+        window.delegate = self
         window.minSize = NSSize(width: 700, height: 450)
         window.contentView = webView
         window.setFrameAutosaveName("PaperSearchMainWindow")
         window.center(); window.makeKeyAndOrderFront(nil)
         buildMenus(); NSApp.activate(ignoringOtherApps: true)
-        log("app.launch", ["bundle": Bundle.main.bundlePath])
+        log("app.launch", ["bundle": Bundle.main.bundlePath, "nativeTitlebar": !window.styleMask.contains(.fullSizeContentView), "movable": window.isMovable, "titlebarHeight": window.frame.height - webView.frame.height])
         startBackend()
+    }
+
+    func windowDidMove(_ notification: Notification) {
+        log("window.moved", ["x": window.frame.origin.x, "y": window.frame.origin.y])
     }
 
     func startBackend() {

@@ -22,6 +22,8 @@ try {
   }
   if (!records.some(record => record.event === 'ui.ready')) throw new Error('macOS 桌面界面启动超时');
   if (!records.some(record => record.event === 'bridge.request' && record.method === 'rendererReady')) throw new Error('macOS 桌面桥接未就绪');
+  const launch = records.find(record => record.event === 'app.launch');
+  if (!launch?.nativeTitlebar || !launch.movable || !(launch.titlebarHeight > 0)) throw new Error('macOS 原生标题栏或窗口拖动配置异常');
   const origin = records.find(record => record.event === 'backend.ready')?.url;
   const html = await (await fetch(origin)).text();
   const token = /name="paper-token" content="([^"]+)"/.exec(html)?.[1];
@@ -29,7 +31,7 @@ try {
   const response = await fetch(origin + '/api/search', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-paper-token': token }, body: JSON.stringify({ query: '搜索', clientId: 'macos-smoke', requestId: 'smoke-1', revision: 0, options: {} }), signal: AbortSignal.timeout(10000) });
   const stream = await response.text();
   if (!response.ok || !stream.includes('"type":"file"') || !stream.includes('"type":"done"') || stream.includes('"type":"error"')) throw new Error('macOS 搜索验证失败: ' + stream.slice(-1000));
-  console.log(JSON.stringify({ event: 'smoke.passed', platform: 'darwin', arch, packaged: true }));
+  console.log(JSON.stringify({ event: 'smoke.passed', platform: 'darwin', arch, packaged: true, nativeTitlebar: launch.nativeTitlebar, titlebarHeight: launch.titlebarHeight }));
 } finally {
   const pid = records.find(record => record.event === 'app.launch')?.appPid;
   if (pid) try { process.kill(pid, 'SIGTERM'); } catch {}
