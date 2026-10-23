@@ -1,8 +1,8 @@
 # GitHub 构建与发布
 
-仓库：https://github.com/xiaohuizli/paper-search
+仓库：https://github.com/xiaohuizli/markdesk
 
-源码和首页 README 在 `main` 分支，补充说明文档在 `docs` 分支。主分支推送和手动运行 `Build installers` 会构建安装包并保存在 Actions artifacts；推送版本标签（例如 `v1.4.1`）会在全部验证成功后自动生成 GitHub Release。
+源码和首页 README 在 `main` 分支，补充说明文档在 `docs` 分支。主分支推送和手动运行 `Build installers` 会构建安装包并保存在 Actions artifacts；推送版本标签（例如 `v1.5.0`）会在全部验证成功后自动生成 GitHub Release。
 
 ## 图标
 
@@ -21,3 +21,7 @@ Windows x64：`npm ci`、`npm run desktop:build:win`、`npm run smoke:win`。Ele
 Linux 执行 Node.js 测试；macOS 两种架构和 Windows x64 分别运行打包后的真实桌面程序，验证界面启动、原生桥接及真实搜索；macOS 额外验证独立原生标题栏、可移动配置与非零标题栏高度。Windows 验证启动的是 NSIS 生成时的 `win-unpacked` 应用；不声称已经通过人工交互式安装向导验收。
 
 macOS 使用 ad-hoc 签名，未进行 Apple 公证；Windows 未配置发行者签名。自动发布使用 GitHub Actions 临时令牌，不在仓库保存个人令牌或签名密钥。原始第三方界面资源来源记录见 `vendor/ASSET-PROVENANCE.md`，不将这些资源声明为本项目原创。
+
+## MarkDesk 更名兼容
+
+v1.5.0 将 Paper Search 统一更名为 MarkDesk，应用、菜单、仓库简介、README 和三个平台安装包使用同一名称。macOS 保留原有 bundle identifier 与窗口偏好键，以沿用工作区书签和窗口设置；Windows 首次运行可读取旧版用户目录中的 workspace.json。内部桥接协议和环境变量保留原有名称，以维持兼容。
